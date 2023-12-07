@@ -110,6 +110,12 @@ void FreeMemory(struct PoliticianData** data)
     free(*data);
 }
 
+double laplace(int k, int number_classes,int attr)
+{          
+    cout<<"k="<<k<<" number_classes="<<number_classes<<" attrcount="<<attr<<endl;                                             
+    double result = double(k)/double(attr + number_classes*k);
+    return result;
+}
 int main()
 {
     int samples = getLinesOfFile();
@@ -126,91 +132,176 @@ int main()
 
 
     //Calculate prior probability for classRepublicans  P(attr1 | CLASS1) = ?
-    double classRepublicansPriorProb[16],classDemocratePriorProb[16];
+    double classRepublicansPriorProb[16],classDemocratePriorProb[16],classRepublicansPriorProbNeg[16],classDemocratePriorProbNeg[16];
     double probRepublican,probDemocrate;
     int lengthRep = 0,lengthDem = 0;
     int countLablesRepub[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     int countLablesDemo[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    int countLablesRepubNeg[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    int countLablesDemoNeg[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     cout << "IndexTOLearn"<<set10index[1] <<endl;
-    for(int i=0;i<set10index[1];i++)
+    for(int i=set10index[0] ; i<set10index[1] ; i++)
     {
         if(data[i].isRepublican)
         {
             if( data[i].handicapped_infants)countLablesRepub[0]++;
+            else countLablesRepubNeg[0]++;
             if( data[i].water_project_cost_sharing)countLablesRepub[1]++;
+            else countLablesRepubNeg[1]++;
             if( data[i].adoption_of_the_budget_resolution) countLablesRepub[2]++;
+            else countLablesRepubNeg[2]++;
             if( data[i].physician_fee_freeze)countLablesRepub[3]++;
+            else countLablesRepubNeg[3]++;
             if( data[i].el_salvador_aid)countLablesRepub[4]++;
+            else countLablesRepubNeg[4]++;
             if( data[i].religious_groups_in_schools) countLablesRepub[5]++;
+            else countLablesRepubNeg[5]++;
             if( data[i].anti_satellite_test_ban)countLablesRepub[6]++;
+            else countLablesRepubNeg[6]++;
             if( data[i].aid_to_nicaraguan_contras)countLablesRepub[7]++;
+            else countLablesRepubNeg[7]++;
             if( data[i].mx_missile) countLablesRepub[8]++;
+            else countLablesRepubNeg[8]++;
             if( data[i].immigration) countLablesRepub[9]++;
+            else countLablesRepubNeg[9]++;
             if( data[i].synfuels_corporation_cutback)countLablesRepub[10]++;
+            else countLablesRepubNeg[10]++;
             if( data[i].education_spending)countLablesRepub[11]++;
+            else countLablesRepubNeg[11]++;
             if( data[i].superfund_right_to_sue)countLablesRepub[12]++;
+            else countLablesRepubNeg[12]++;
             if( data[i].crime)countLablesRepub[13]++;
+            else countLablesRepubNeg[13]++;
             if( data[i].duty_free_exports)countLablesRepub[14]++;
+            else countLablesRepubNeg[14]++;
             if( data[i].export_administration_act_south_africa )countLablesRepub[15]++;
+            else countLablesRepubNeg[15]++;
 
             lengthRep++;
         }
         else
         {
             if( data[i].handicapped_infants)countLablesDemo[0]++;
+            else countLablesDemoNeg[0]++;
             if( data[i].water_project_cost_sharing)countLablesDemo[1]++;
+            else countLablesDemoNeg[1]++;
             if( data[i].adoption_of_the_budget_resolution) countLablesDemo[2]++;
+            else countLablesDemoNeg[2]++;
             if( data[i].physician_fee_freeze)countLablesDemo[3]++;
+            else countLablesDemoNeg[3]++;
             if( data[i].el_salvador_aid)countLablesDemo[4]++;
+            else countLablesDemoNeg[4]++;
             if( data[i].religious_groups_in_schools) countLablesDemo[5]++;
+            else countLablesDemoNeg[5]++;
             if( data[i].anti_satellite_test_ban)countLablesDemo[6]++;
+            else countLablesDemoNeg[6]++;
             if( data[i].aid_to_nicaraguan_contras)countLablesDemo[7]++;
+            else countLablesDemoNeg[7]++;
             if( data[i].mx_missile) countLablesDemo[8]++;
+            else countLablesDemoNeg[8]++;
             if( data[i].immigration) countLablesDemo[9]++;
+            else countLablesDemoNeg[9]++;
             if( data[i].synfuels_corporation_cutback)countLablesDemo[10]++;
+            else countLablesDemoNeg[10]++;
             if( data[i].education_spending)countLablesDemo[11]++;
+            else countLablesDemoNeg[11]++;
             if( data[i].superfund_right_to_sue)countLablesDemo[12]++;
+            else countLablesDemoNeg[12]++;
             if( data[i].crime)countLablesDemo[13]++;
+            else countLablesDemoNeg[13]++;
             if( data[i].duty_free_exports)countLablesDemo[14]++;
+            else countLablesDemoNeg[14]++;
             if( data[i].export_administration_act_south_africa )countLablesDemo[15]++;
+            else countLablesDemoNeg[15]++;
+
             lengthDem++;
         }
     }
     //Eval prop p(a1|republican)
     for(int i=0;i<16;i++) {
-        classRepublicansPriorProb[i] = (double)countLablesRepub[i] / (double)lengthRep;
-        classDemocratePriorProb[i] = (double)countLablesDemo[i] / (double)lengthDem;
-        if(classRepublicansPriorProb[i] == 0.0f)cout<<"INdex_rep " << i <<endl;
-        if(classDemocratePriorProb[i] == 0.0f) cout<<"index_dem " << i <<endl;
+        //classRepublicansPriorProb[i] = (double)countLablesRepub[i] / (double)lengthRep;
+        //classDemocratePriorProb[i] = (double)countLablesDemo[i] / (double)lengthDem;
+        classRepublicansPriorProb[i] = laplace(1,2,countLablesRepub[i] + countLablesDemo[i]);
+        classDemocratePriorProb[i] = laplace(1,2,countLablesRepub[i]+ countLablesDemo[i]);
+        classRepublicansPriorProbNeg[i] = laplace(1,2,countLablesRepubNeg[i] + countLablesDemoNeg[i]);
+        classDemocratePriorProbNeg[i] = laplace(1,2,countLablesRepubNeg[i]+ countLablesDemoNeg[i]);
+        /*if(classRepublicansPriorProb[i] == 0.0f){
+            classRepublicansPriorProb[i] = laplace(1,2,countLablesRepub[i] + countLablesDemo[i]);
+            cout<<"INdex_rep " << i <<"now value "<<classRepublicansPriorProb[i]<<endl;
+        }
+        if(classDemocratePriorProb[i] == 0.0f){
+            classDemocratePriorProb[i] = laplace(1,2,countLablesRepub[i]+ countLablesDemo[i]);
+             cout<<"INdex_rep " << i <<"now value "<<classDemocratePriorProb[i]<<endl;
+        }*/
     }
-    probRepublican = double(lengthRep/set10index[1]);
-    probDemocrate = 1.0f -probRepublican;
-    
 
+    probRepublican = ((double)lengthRep/(double)set10index[1]);
+    probDemocrate = 1.0f - probRepublican;
+    
+    int uspeh=0;
     //Here we will calc P(c1 | a1,a2) = p(a1,a2 | c1) = p(a1|c1)*p(a2|c1)*p(c1);
     for(int i=set10index[1];i<samples;i++)
     {
-       double valueRep=1.0f, valueDem=1.0f;
+       double valueRep=0.0f, valueDem=0.0f;
        
-            if( data[i].handicapped_infants)valueRep *= classRepublicansPriorProb[0] ,valueDem*=classRepublicansPriorProb[0];
-            if( data[i].water_project_cost_sharing)valueRep *= classRepublicansPriorProb[1],valueDem*=classRepublicansPriorProb[1];
-            if( data[i].adoption_of_the_budget_resolution) valueRep *= classRepublicansPriorProb[2],valueDem*=classRepublicansPriorProb[2];
-            if( data[i].physician_fee_freeze)valueRep *= classRepublicansPriorProb[3],valueDem*=classRepublicansPriorProb[3];
-            if( data[i].el_salvador_aid) valueRep *= classRepublicansPriorProb[4],valueDem*=classRepublicansPriorProb[4];
-            if( data[i].religious_groups_in_schools) valueRep *= classRepublicansPriorProb[5],valueDem*=classRepublicansPriorProb[5];
-            if( data[i].anti_satellite_test_ban)valueRep *= classRepublicansPriorProb[6],valueDem*=classRepublicansPriorProb[6];
-            if( data[i].aid_to_nicaraguan_contras)valueRep *= classRepublicansPriorProb[7],valueDem*=classRepublicansPriorProb[7];
-            if( data[i].mx_missile) valueRep *= classRepublicansPriorProb[8],valueDem*=classRepublicansPriorProb[8];
-            if( data[i].immigration) valueRep *= classRepublicansPriorProb[9],valueDem*=classRepublicansPriorProb[9];
-            if( data[i].synfuels_corporation_cutback)valueRep *= classRepublicansPriorProb[10],valueDem*=classRepublicansPriorProb[10];
-            if( data[i].education_spending)valueRep *= classRepublicansPriorProb[11],valueDem*=classRepublicansPriorProb[11];
-            if( data[i].superfund_right_to_sue) valueRep *= classRepublicansPriorProb[12],valueDem*=classRepublicansPriorProb[12];
-            if( data[i].crime) valueRep *= classRepublicansPriorProb[13],valueDem*=classRepublicansPriorProb[13];
-            if( data[i].duty_free_exports) valueRep *= classRepublicansPriorProb[14],valueDem*=classRepublicansPriorProb[14];
-            if( data[i].export_administration_act_south_africa )valueRep *= classRepublicansPriorProb[15],valueDem*=classRepublicansPriorProb[15];
-        valueRep *= probRepublican;
-        valueDem *= probDemocrate;
+            if( data[i].handicapped_infants)valueRep += log(classRepublicansPriorProb[0]) ,valueDem+=log(classDemocratePriorProb[0]);
+            else valueRep += log(classRepublicansPriorProbNeg[0]) ,valueDem += log(classDemocratePriorProbNeg[0]);
+
+            if( data[i].water_project_cost_sharing)valueRep += log(classRepublicansPriorProb[1]) ,valueDem+=log(classDemocratePriorProb[1]);
+            else valueRep += log(classRepublicansPriorProbNeg[1]) ,valueDem += log(classDemocratePriorProbNeg[1]);
+
+            if( data[i].adoption_of_the_budget_resolution)valueRep += log(classRepublicansPriorProb[2]) ,valueDem+=log(classDemocratePriorProb[2]);
+            else valueRep += log(classRepublicansPriorProbNeg[2]) ,valueDem += log(classDemocratePriorProbNeg[2]);
+
+            if( data[i].physician_fee_freeze)valueRep += log(classRepublicansPriorProb[3]) ,valueDem+=log(classDemocratePriorProb[3]);
+            else valueRep += log(classRepublicansPriorProbNeg[3]) ,valueDem += log(classDemocratePriorProbNeg[3]);
+
+            if( data[i].el_salvador_aid) valueRep += log(classRepublicansPriorProb[4]) ,valueDem+=log(classDemocratePriorProb[4]);
+            else valueRep += log(classRepublicansPriorProbNeg[4]) ,valueDem += log(classDemocratePriorProbNeg[4]);
+
+            if( data[i].religious_groups_in_schools) valueRep += log(classRepublicansPriorProb[5]) ,valueDem+=log(classDemocratePriorProb[5]);
+            else valueRep += log(classRepublicansPriorProbNeg[5]) ,valueDem += log(classDemocratePriorProbNeg[5]);
+
+            if( data[i].anti_satellite_test_ban)valueRep += log(classRepublicansPriorProb[6]) ,valueDem+=log(classDemocratePriorProb[6]);
+            else valueRep += log(classRepublicansPriorProbNeg[6]) ,valueDem += log(classDemocratePriorProbNeg[6]);
+
+            if( data[i].aid_to_nicaraguan_contras)valueRep += log(classRepublicansPriorProb[7]) ,valueDem+=log(classDemocratePriorProb[7]);
+            else valueRep += log(classRepublicansPriorProbNeg[7]) ,valueDem += log(classDemocratePriorProbNeg[7]);
+
+            if( data[i].mx_missile) valueRep += log(classRepublicansPriorProb[8]) ,valueDem+=log(classDemocratePriorProb[8]);
+            else valueRep += log(classRepublicansPriorProbNeg[8]) ,valueDem += log(classDemocratePriorProbNeg[8]);
+
+            if( data[i].immigration) valueRep += log(classRepublicansPriorProb[9]) ,valueDem+=log(classDemocratePriorProb[9]);
+            else valueRep += log(classRepublicansPriorProbNeg[9]) ,valueDem += log(classDemocratePriorProbNeg[9]);
+
+            if( data[i].synfuels_corporation_cutback)valueRep += log(classRepublicansPriorProb[10]) ,valueDem+=log(classDemocratePriorProb[10]);
+            else valueRep += log(classRepublicansPriorProbNeg[10]) ,valueDem += log(classDemocratePriorProbNeg[10]);
+
+            if( data[i].education_spending)valueRep += log(classRepublicansPriorProb[11]) ,valueDem+=log(classDemocratePriorProb[11]);
+            else valueRep += log(classRepublicansPriorProbNeg[11]) ,valueDem += log(classDemocratePriorProbNeg[11]);
+
+            if( data[i].superfund_right_to_sue) valueRep += log(classRepublicansPriorProb[12]) ,valueDem+=log(classDemocratePriorProb[12]);
+            else valueRep += log(classRepublicansPriorProbNeg[12]) ,valueDem += log(classDemocratePriorProbNeg[12]);
+
+            if( data[i].crime) valueRep += log(classRepublicansPriorProb[13]) ,valueDem+=log(classDemocratePriorProb[13]);
+            else valueRep += log(classRepublicansPriorProbNeg[13]) ,valueDem += log(classDemocratePriorProbNeg[13]);
+
+            if( data[i].duty_free_exports)valueRep += log(classRepublicansPriorProb[14]) ,valueDem+=log(classDemocratePriorProb[14]);
+            else valueRep += log(classRepublicansPriorProbNeg[14]) ,valueDem += log(classDemocratePriorProbNeg[14]);
+
+            if( data[i].export_administration_act_south_africa )valueRep += log(classRepublicansPriorProb[15]) ,valueDem+=log(classDemocratePriorProb[15]);
+            else valueRep += log(classRepublicansPriorProbNeg[15]) ,valueDem += log(classDemocratePriorProbNeg[15]);
+
+        valueRep += log(probRepublican);
+        valueDem += log(probDemocrate);
         cout << data[i].isRepublican << " " << "Predicted value for Republican:" << valueRep << " Predicted value for Democrate:" << valueDem << endl;
+
+        bool res = data[i].isRepublican ? (valueRep >= valueDem) : (valueRep <= valueDem);
+        if(res)uspeh++;
+
     }
+
+    cout << "Accuracy=" << (double)uspeh/(samples-set10index[1]) << endl;
+
     FreeMemory(&data);
 }
