@@ -77,9 +77,9 @@ void FreeMemory(struct PoliticianData** data)
     free(*data);
 }
 
-double laplace(int k, int number_classes,int attr)
+double laplace(int cxy,int k, int number_classes,int attr)
 {                                                 
-    double result = double(k)/double(attr + number_classes*k);
+    double result = double(cxy + k)/double(attr + number_classes*k);
     return result;
 }
 int main()
@@ -135,10 +135,10 @@ int main()
 
         //Eval prop p( attr | Class)
         for(int i=0;i<16;i++) {
-            classRepublicansPriorProb[i] = laplace(1,2,countLablesRepub[i] + countLablesDemo[i]);
-            classDemocratePriorProb[i] = laplace(1,2,countLablesRepub[i]+ countLablesDemo[i]);
-            classRepublicansPriorProbNeg[i] = laplace(1,2,countLablesRepubNeg[i] + countLablesDemoNeg[i]);
-            classDemocratePriorProbNeg[i] = laplace(1,2,countLablesRepubNeg[i]+ countLablesDemoNeg[i]);
+            classRepublicansPriorProb[i] = laplace(countLablesRepub[i],1,2,lengthRep);
+            classDemocratePriorProb[i] = laplace(countLablesDemo[i],1,2,lengthDem);
+            classRepublicansPriorProbNeg[i] = laplace(countLablesRepubNeg[i],1,2,lengthRep);
+            classDemocratePriorProbNeg[i] = laplace(countLablesDemoNeg[i],1,2,lengthDem);
         }
 
         probRepublican = ( (double)lengthRep/(double)(set10index[trainset + 1] - set10index[trainset] + 1) );
