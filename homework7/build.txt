@@ -1,0 +1,5 @@
+g++ HW7_62604.cpp -I/home/alex/Desktop/inteligentni_sistemi/homeworks/homework7/SFML/include -L/home/alex/Desktop/inteligentni_sistemi/homeworks/homework7/SFML/lib -lsfml-graphics -lsfml-window -lsfml-system
+
+
+ export LD_LIBRARY_PATH=/home/alex/Desktop/inteligentni_sistemi/homeworks/homework7/SFML/lib
+
